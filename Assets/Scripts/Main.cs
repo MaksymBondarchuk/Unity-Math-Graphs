@@ -17,15 +17,16 @@ public class Main : MonoBehaviour
 
     private bool IsMiddleClicked { get; set; }
 
-    // Use this for initialization
-    void Start()
+    // ReSharper disable once UnusedMember.Local
+    private void Start()
     {
+        Cursor.visible = true;
         Debug.Log(string.Format("I am alive! - {0}", DateTime.Now));
         //myNodes = new ArrayList();
     }
 
-    // Update is called once per frame
-    void Update()
+    // ReSharper disable once UnusedMember.Local
+    private void Update()
     {
         if (Input.GetMouseButtonDown(0))
             OnMouseDown();
@@ -94,14 +95,17 @@ public class Main : MonoBehaviour
 
     private void MoveRightPressed()
     {
-        const float velocity = (float)0.01;
+        const float velocity = (float)0.001;
+
         var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
         var pos = transform.rotation;
-        Debug.Log(string.Format("Rot {0}, {1}, {2}", pos.x, pos.y, pos.z));
-        pos.x += velocity * (MiddleClick.x - mousePosition.x);
-        //pos.y += velocity * (MiddleClick.y - mousePosition.y);
+        //Debug.Log(string.Format("Rot {0}, {1}, {2}", pos.x, pos.y, pos.z));
+        pos.x += velocity * (RightClick.y - mousePosition.y);
+        //pos.x += (float)0.01;
+        pos.y -= velocity * (RightClick.x - mousePosition.x);
         transform.rotation = pos;
-        MiddleClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
+        RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
+        //transform.RotateAround(mousePosition, Vector3.up, Input.GetAxis("Mouse X") * velocity);
     }
 
     private void MoveMiddlePressed()
