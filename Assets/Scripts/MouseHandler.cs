@@ -83,14 +83,24 @@ public class MouseHandler : MonoBehaviour
         const float velocity = (float)0.001;
 
         var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-        var pos = transform.rotation;
-        //Debug.Log(string.Format("Rot {0}, {1}, {2}", pos.x, pos.y, pos.z));
-        pos.x += velocity * (RightClick.y - mousePosition.y);
-        //pos.x += (float)0.01;
-        pos.y -= velocity * (RightClick.x - mousePosition.x);
-        transform.rotation = pos;
-        RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
+        //var rot = transform.rotation;
+        ////Debug.Log(string.Format("Rot {0}, {1}, {2}", pos.x, pos.y, pos.z));
+        //rot.x += velocity * (RightClick.y - mousePosition.y);
+        ////pos.x += (float)0.01;
+        //rot.y -= velocity * (RightClick.x - mousePosition.x);
+        //transform.rotation = rot;
+        //RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
         //transform.RotateAround(mousePosition, Vector3.up, Input.GetAxis("Mouse X") * velocity);
+
+        //float tiltAroundZ = Input.GetAxis("Horizontal") * 15;
+        //float tiltAroundX = Input.GetAxis("Vertical") * 15;
+        //Quaternion target = Quaternion.Euler(tiltAroundX, 0, tiltAroundZ);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * 15);
+
+        transform.RotateAround(transform.position, new Vector3(1.0f, 0.0f, 0.0f), (RightClick.y - mousePosition.y) * Time.deltaTime * 5);
+        transform.RotateAround(transform.position, new Vector3(0.0f, 1.0f, 0.0f), -(RightClick.x - mousePosition.x) * Time.deltaTime * 5);
+        transform.RotateAround(transform.position, new Vector3(0.0f, 0.0f, 1.0f), (RightClick.z - mousePosition.z) * Time.deltaTime * 5);
+        RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
     }
 
     private void MoveMiddlePressed()
