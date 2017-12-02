@@ -105,12 +105,15 @@ public class MouseHandler : MonoBehaviour
 
     private void MoveMiddlePressed()
     {
-        const float velocity = (float)0.1;
+        const float speed = (float)0.1;
         var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-        var pos = transform.position;
-        pos.x += velocity * (MiddleClick.x - mousePosition.x);
-        pos.y += velocity * (MiddleClick.y - mousePosition.y);
-        transform.position = pos;
+        //var pos = transform.position;
+        //pos.x += speed * (MiddleClick.x - mousePosition.x);
+        //pos.y += speed * (MiddleClick.y - mousePosition.y);
+        //transform.position = pos;
+
+        transform.Translate(new Vector3((MiddleClick.x - mousePosition.x) * Time.deltaTime, (MiddleClick.y - mousePosition.y) * Time.deltaTime, 0));
         MiddleClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
+        //transform.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
     }
 }
