@@ -89,19 +89,25 @@ namespace Assets.Scripts
 
         public void OnAddVertexButtonclick()
         {
+            var buttons = FindObjectsOfType<Button>();
+            buttons[1].GetComponent<Image>().color = !IsInAddVertexMode ? Color.red : Color.white;
+
             IsInAddVertexMode = !IsInAddVertexMode;
 
             //ColorBlock colorBlock = new ColorBlock();
             //colorBlock.normalColor = Color.red;
 
-            //var buttons = FindObjectsOfType<Button>();// GetComponent<Canvas>().GetComponents<Button>();
+            // GetComponent<Canvas>().GetComponents<Button>();
             //var colorBlock = buttons[0].colors;
             //colorBlock.normalColor = Color.red;
-            //buttons[0].colors = colorBlock;
+
         }
 
         public void OnAddEdgeButtonclick()
         {
+            var buttons = FindObjectsOfType<Button>();
+            buttons[0].GetComponent<Image>().color = !IsInAddEdgeMode ? Color.red : Color.white;
+
             IsInAddEdgeMode = !IsInAddEdgeMode;
         }
     }
