@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
+// ReSharper disable UnusedMember.Local
 
 namespace Assets.Scripts
 {
@@ -9,18 +12,19 @@ namespace Assets.Scripts
         private List<Transform> HitObject { get; set; }
         private Transform FirstNode { get; set; }
 
-        // ReSharper disable once UnusedMember.Local
-        void Start()
+        private bool IsInAddVertexMode { get; set; }
+        private bool IsInAddEdgeMode { get; set; }
+
+        private void Start()
         {
             HitObject = new List<Transform>();
         }
 
-        // ReSharper disable once UnusedMember.Local
-        void Update()
+        private void Update()
         {
             Transform objectHit = null;
 
-            if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.L))
+            if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.L) && IsInAddVertexMode)
                 AddNode();
 
             foreach (var objectHited in HitObject)
@@ -35,7 +39,7 @@ namespace Assets.Scripts
                 HitObject.Add(objectHit);
             }
 
-            if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.L) && objectHit != null)
+            if (Input.GetMouseButtonDown(0) && (IsInAddEdgeMode || Input.GetKey(KeyCode.L)) && objectHit != null)
             {
                 if (FirstNode == null)
                     FirstNode = objectHit;
@@ -45,6 +49,10 @@ namespace Assets.Scripts
                     FirstNode = null;
                 }
             }
+
+            //if (Input.GetButtonDown("Add vertex"))
+            //    Debug.Break();
+
         }
 
 
@@ -71,12 +79,30 @@ namespace Assets.Scripts
         {
             var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 
-            const float radius = (float) .1;
-            cylinder.transform.localScale = new Vector3(radius, Vector3.Distance(node2.position, node1.position)/2, radius);
+            const float radius = (float).1;
+            cylinder.transform.localScale = new Vector3(radius, Vector3.Distance(node2.position, node1.position) / 2, radius);
 
 
-            cylinder.transform.position = node1.position + (node2.position - node1.position)/2;
+            cylinder.transform.position = node1.position + (node2.position - node1.position) / 2;
             cylinder.transform.up = node2.position - node1.position;
+        }
+
+        public void OnAddVertexButtonclick()
+        {
+            IsInAddVertexMode = !IsInAddVertexMode;
+
+            //ColorBlock colorBlock = new ColorBlock();
+            //colorBlock.normalColor = Color.red;
+
+            //var buttons = FindObjectsOfType<Button>();// GetComponent<Canvas>().GetComponents<Button>();
+            //var colorBlock = buttons[0].colors;
+            //colorBlock.normalColor = Color.red;
+            //buttons[0].colors = colorBlock;
+        }
+
+        public void OnAddEdgeButtonclick()
+        {
+            IsInAddEdgeMode = !IsInAddEdgeMode;
         }
     }
 }
