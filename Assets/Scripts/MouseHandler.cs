@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
+// ReSharper disable UnusedMember.Local
 
 namespace Assets.Scripts
 {
+    // ReSharper disable once UnusedMember.Global
     public class MouseHandler : MonoBehaviour
     {
-        //private ArrayList myNodes;
-        //public Camera MainCamera { get; set; }
-        //public Camera MainCamera2 { get; set; }
-        //public GameObject Sphere { get; set; }
-
         private Vector3 RightClick { get; set; }
 
         private bool IsRightClicked { get; set; }
@@ -17,27 +14,22 @@ namespace Assets.Scripts
 
         private bool IsMiddleClicked { get; set; }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             Cursor.visible = true;
-            //myNodes = new ArrayList();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Update()
         {
             #region MoveCamera
             if (Input.GetMouseButtonDown(1))
             {
-                //Debug.Log("Pressed right click.");
                 RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
                 IsRightClicked = true;
             }
 
             if (Input.GetMouseButtonUp(1))
             {
-                //Debug.Log("Released right click.");
                 IsRightClicked = false;
             }
 
@@ -46,14 +38,12 @@ namespace Assets.Scripts
 
             if (Input.GetMouseButtonDown(2))
             {
-                //Debug.Log("Pressed middle click.");
                 MiddleClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
                 IsMiddleClicked = true;
             }
 
             if (Input.GetMouseButtonUp(2))
             {
-                //Debug.Log("Released middle click.");
                 IsMiddleClicked = false;
             }
 
@@ -69,34 +59,12 @@ namespace Assets.Scripts
 
         private void MoveCamera(int step)
         {
-            if (step > 0)
-                transform.Translate(Vector3.forward);
-            else
-                transform.Translate(Vector3.back);
-            //var pos = transform.position;
-            //pos.z += step;
-            //transform.position = pos;
+            transform.Translate(step > 0 ? Vector3.forward : Vector3.back);
         }
 
         private void MoveRightPressed()
         {
-            //const float velocity = (float)0.001;
-
             var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-            //var rot = transform.rotation;
-            ////Debug.Log(string.Format("Rot {0}, {1}, {2}", pos.x, pos.y, pos.z));
-            //rot.x += velocity * (RightClick.y - mousePosition.y);
-            ////pos.x += (float)0.01;
-            //rot.y -= velocity * (RightClick.x - mousePosition.x);
-            //transform.rotation = rot;
-            //RightClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-            //transform.RotateAround(mousePosition, Vector3.up, Input.GetAxis("Mouse X") * velocity);
-
-            //float tiltAroundZ = Input.GetAxis("Horizontal") * 15;
-            //float tiltAroundX = Input.GetAxis("Vertical") * 15;
-            //Quaternion target = Quaternion.Euler(tiltAroundX, 0, tiltAroundZ);
-            //transform.rotation = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * 15);
-
             transform.RotateAround(transform.position, new Vector3(1.0f, 0.0f, 0.0f), (RightClick.y - mousePosition.y) * Time.deltaTime * 5);
             transform.RotateAround(transform.position, new Vector3(0.0f, 1.0f, 0.0f), -(RightClick.x - mousePosition.x) * Time.deltaTime * 5);
             transform.RotateAround(transform.position, new Vector3(0.0f, 0.0f, 1.0f), (RightClick.z - mousePosition.z) * Time.deltaTime * 5);
@@ -105,16 +73,9 @@ namespace Assets.Scripts
 
         private void MoveMiddlePressed()
         {
-            //const float speed = (float)0.1;
             var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-            //var pos = transform.position;
-            //pos.x += speed * (MiddleClick.x - mousePosition.x);
-            //pos.y += speed * (MiddleClick.y - mousePosition.y);
-            //transform.position = pos;
-
             transform.Translate(new Vector3((MiddleClick.x - mousePosition.x) * Time.deltaTime, (MiddleClick.y - mousePosition.y) * Time.deltaTime, 0));
             MiddleClick = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-            //transform.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
         }
     }
 }

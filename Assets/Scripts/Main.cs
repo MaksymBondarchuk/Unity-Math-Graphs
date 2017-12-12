@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.UI;
 // ReSharper disable UnusedMember.Global
@@ -33,7 +35,7 @@ namespace Assets.Scripts
         {
             Transform objectHit = null;
 
-            if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.L) && (IsInAddVertexMode || Input.GetKey(KeyCode.A)))
+            if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.L) && IsInAddVertexMode)
                 AddVertex(Input.mousePosition);
 
             foreach (var objectHited in HitObject)
@@ -115,7 +117,7 @@ namespace Assets.Scripts
         public void OnAddVertexButtonclick()
         {
             var buttons = FindObjectsOfType<Button>();
-            buttons[2].GetComponent<Image>().color = !IsInAddVertexMode ? Color.red : Color.white;
+            buttons[buttons.Length - 1].GetComponent<Image>().color = !IsInAddVertexMode ? Color.red : Color.white;
             IsInAddVertexMode = !IsInAddVertexMode;
         }
 
@@ -129,11 +131,13 @@ namespace Assets.Scripts
 
         public void OnExportButtonclick()
         {
+#if UNITY_EDITOR
             var path = EditorUtility.SaveFilePanel(
                  "Select file to save",
                  "JavaScript Object Notation",
                  "TestFile" + ".json",
                  "JSON");
+
 
             if (path.Length != 0)
             {
@@ -147,10 +151,12 @@ namespace Assets.Scripts
                 using (var file = new StreamWriter(path))
                     file.WriteLine(json);
             }
+#endif
         }
 
         public void OnImportButtonclick()
         {
+#if UNITY_EDITOR
             var path = EditorUtility.OpenFilePanel(
                  "Select file to save",
                  "",
@@ -169,6 +175,7 @@ namespace Assets.Scripts
                         AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2));
                 }
             }
+#endif
         }
 
         public void DeleteAll()
