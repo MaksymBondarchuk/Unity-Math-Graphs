@@ -13,6 +13,7 @@ using UnityEngine.UI;
 namespace Assets.Scripts
 {
     // ReSharper disable once UnusedMember.Global
+    [RequireComponent(typeof(AudioSource))]
     public class Main : MonoBehaviour
     {
         private List<Transform> HitObject { get; set; }
@@ -64,20 +65,17 @@ namespace Assets.Scripts
 
         private void AddVertex(Vector3 center, bool isStrongCenter = false)
         {
-            //Debug.Log(string.Format("{0}, {1}, {2}", Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z));
-            //var mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
-
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
+            var pos = center;
             if (isStrongCenter)
-            {
                 sphere.transform.position = center;
-            }
             else
             {
                 center.z = 10;
                 var objPosition = Camera.main.ScreenToWorldPoint(center);
                 sphere.transform.position = objPosition;
+                pos = objPosition;
             }
 
             //sphere.GetComponent<Renderer>().material.color = Color.red;
@@ -89,6 +87,14 @@ namespace Assets.Scripts
                 Y = sphere.transform.position.y,
                 Z = sphere.transform.position.z
             });
+
+            var smoke = GameObject.Find("WhiteSmoke");
+            Instantiate(smoke, pos, new Quaternion(-90,0,0,90));
+
+            var sound = FindObjectsOfType<AudioSource>()[1];
+            sound.Play();
+
+            IsInAddVertexMode = false;
         }
 
         private void AddEdge(Vector3 node1, Vector3 node2)
@@ -112,31 +118,39 @@ namespace Assets.Scripts
                 Y2 = node2.y,
                 Z2 = node2.z
             });
+
+            var sound = FindObjectsOfType<AudioSource>()[0];
+            sound.Play();
+
+            IsInAddEdgeMode = false;
         }
 
         public void OnAddVertexButtonclick()
         {
-            var buttons = FindObjectsOfType<Button>();
-            buttons[buttons.Length - 1].GetComponent<Image>().color = !IsInAddVertexMode ? Color.red : Color.white;
-            IsInAddVertexMode = !IsInAddVertexMode;
+            //var buttons = FindObjectsOfType<Button>();
+            //buttons[buttons.Length - 1].GetComponent<Image>().color = !IsInAddVertexMode ? Color.red : Color.white;
+            IsInAddVertexMode = true;
         }
 
         public void OnAddEdgeButtonclick()
         {
-            var buttons = FindObjectsOfType<Button>();
-            buttons[0].GetComponent<Image>().color = !IsInAddEdgeMode ? Color.red : Color.white;
+            //var buttons = FindObjectsOfType<Button>();
+            //buttons[0].GetComponent<Image>().color = !IsInAddEdgeMode ? Color.red : Color.white;
 
-            IsInAddEdgeMode = !IsInAddEdgeMode;
+            IsInAddEdgeMode = true;
         }
 
         public void OnExportButtonclick()
         {
 #if UNITY_EDITOR
             var path = EditorUtility.SaveFilePanel(
-                 "Select file to save",
-                 "JavaScript Object Notation",
-                 "TestFile" + ".json",
-                 "JSON");
+                    "Select file to save",
+                    "JavaScript Object Notation",
+                    "TestFile" + ".json",
+                    "JSON");
+#else
+            var path = "GraphFile.json";
+#endif
 
 
             if (path.Length != 0)
@@ -151,16 +165,18 @@ namespace Assets.Scripts
                 using (var file = new StreamWriter(path))
                     file.WriteLine(json);
             }
-#endif
         }
 
         public void OnImportButtonclick()
         {
 #if UNITY_EDITOR
             var path = EditorUtility.OpenFilePanel(
-                 "Select file to save",
-                 "",
-                 "JSON");
+                    "Select file to save",
+                    "",
+                    "JSON");
+#else
+            var path = "GraphFile.json";
+#endif
 
             if (path.Length != 0)
             {
@@ -175,10 +191,9 @@ namespace Assets.Scripts
                         AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2));
                 }
             }
-#endif
         }
 
-        public void DeleteAll()
+        private static void DeleteAll()
         {
             foreach (var o in FindObjectsOfType<GameObject>().Where(o => o.tag == "vertex" || o.tag == "edge"))
                 Destroy(o);
