@@ -96,7 +96,7 @@ public class MouseHandler : MonoBehaviour
         // affect the desired Zoom distance if we roll the scrollwheel
         desiredDistance -= Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime * zoomRate * Mathf.Abs(desiredDistance);
         //clamp the zoom min/max
-        desiredDistance = Mathf.Clamp(desiredDistance, minDistance, maxDistance);
+        //desiredDistance = Mathf.Clamp(desiredDistance, minDistance, maxDistance);
         // For smoothing of the zoom, lerp distance
         currentDistance = Mathf.Lerp(currentDistance, desiredDistance, Time.deltaTime * zoomDampening);
 

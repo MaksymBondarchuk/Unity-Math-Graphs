@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEditor;
 #endif
 using UnityEngine;
-using UnityEngine.UI;
 // ReSharper disable UnusedMember.Global
 
 // ReSharper disable UnusedMember.Local
@@ -30,6 +29,9 @@ namespace Assets.Scripts
             HitObject = new List<Transform>();
             JsonVertices = new List<JsonVertex>();
             JsonEdges = new List<JsonEdge>();
+
+            //var smoke = GameObject.Find("WhiteSmoke");
+            //smoke.SetActive(false);
         }
 
         private void Update()
@@ -47,7 +49,9 @@ namespace Assets.Scripts
             if (Physics.Raycast(ray, out hit))
             {
                 objectHit = hit.transform;
-                objectHit.GetComponent<Renderer>().material.color = Color.blue;
+                objectHit.GetComponent<Renderer>().material.color = Color.yellow;
+                //objectHit.GetComponent<Renderer>().material.color = new Vector4(0, 209, 174, 45);
+                //objectHit.GetComponent<Renderer>().material.color = new Vector4(0, 255, 0, 0);
                 HitObject.Add(objectHit);
             }
 
@@ -65,6 +69,8 @@ namespace Assets.Scripts
 
         private void AddVertex(Vector3 center, bool isStrongCenter = false)
         {
+            IsInAddVertexMode = false;
+
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
             var pos = center;
@@ -89,12 +95,13 @@ namespace Assets.Scripts
             });
 
             var smoke = GameObject.Find("WhiteSmoke");
-            Instantiate(smoke, pos, new Quaternion(-90,0,0,90));
+            //smoke.SetActive(true);
+            var newSmoke = (GameObject) Instantiate(smoke, pos, new Quaternion(-90,0,0,90));
+            //smoke.SetActive(false);
+            newSmoke.SetActive(true);
 
-            var sound = FindObjectsOfType<AudioSource>()[1];
+            var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "vertex sound");
             sound.Play();
-
-            IsInAddVertexMode = false;
         }
 
         private void AddEdge(Vector3 node1, Vector3 node2)
@@ -119,7 +126,7 @@ namespace Assets.Scripts
                 Z2 = node2.z
             });
 
-            var sound = FindObjectsOfType<AudioSource>()[0];
+            var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "edge sound");
             sound.Play();
 
             IsInAddEdgeMode = false;
@@ -142,14 +149,15 @@ namespace Assets.Scripts
 
         public void OnExportButtonclick()
         {
+            // ReSharper disable once RedundantAssignment
+            var path = "C:\\3D Graph Builder\\GraphFile.json";
+
 #if UNITY_EDITOR
-            var path = EditorUtility.SaveFilePanel(
+            path = EditorUtility.SaveFilePanel(
                     "Select file to save",
                     "JavaScript Object Notation",
                     "TestFile" + ".json",
                     "JSON");
-#else
-            var path = "GraphFile.json";
 #endif
 
 
@@ -165,17 +173,20 @@ namespace Assets.Scripts
                 using (var file = new StreamWriter(path))
                     file.WriteLine(json);
             }
+
+            var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "applause");
+            sound.Play();
         }
 
         public void OnImportButtonclick()
         {
+            // ReSharper disable once RedundantAssignment
+            var path = "C:\\3D Graph Builder\\GraphFile.json";
 #if UNITY_EDITOR
-            var path = EditorUtility.OpenFilePanel(
+            path = EditorUtility.OpenFilePanel(
                     "Select file to save",
                     "",
                     "JSON");
-#else
-            var path = "GraphFile.json";
 #endif
 
             if (path.Length != 0)
@@ -191,11 +202,14 @@ namespace Assets.Scripts
                         AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2));
                 }
             }
+
+            var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "applause");
+            sound.Play();
         }
 
         private static void DeleteAll()
         {
-            foreach (var o in FindObjectsOfType<GameObject>().Where(o => o.tag == "vertex" || o.tag == "edge"))
+            foreach (var o in FindObjectsOfType<GameObject>().Where(o => o.tag == "vertex" || o.tag == "edge" || o.tag == "smoke"))
                 Destroy(o);
         }
     }
