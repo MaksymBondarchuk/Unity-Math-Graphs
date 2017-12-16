@@ -20,6 +20,7 @@ namespace Assets.Scripts
 
         private bool IsInAddVertexMode { get; set; }
         private bool IsInAddEdgeMode { get; set; }
+        private bool IsInDeleteMode { get; set; }
 
         private List<JsonVertex> JsonVertices { get; set; }
         private List<JsonEdge> JsonEdges { get; set; }
@@ -42,8 +43,10 @@ namespace Assets.Scripts
             if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.L) && IsInAddVertexMode)
                 AddVertex(Input.mousePosition);
 
+
             foreach (var objectHited in HitObject)
-                objectHited.GetComponent<Renderer>().material.color = Color.gray;
+                if (objectHited != null)
+                    objectHited.GetComponent<Renderer>().material.color = Color.gray;
             HitObject.Clear();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -66,6 +69,9 @@ namespace Assets.Scripts
                     FirstNode = null;
                 }
             }
+
+            if (Input.GetMouseButtonDown(0) && IsInDeleteMode)
+                Delete(objectHit);
         }
 
         private void AddVertex(Vector3 center, bool isStrongCenter = false)
@@ -97,7 +103,7 @@ namespace Assets.Scripts
 
             var smoke = GameObject.Find("WhiteSmoke");
             //smoke.SetActive(true);
-            var newSmoke = (GameObject) Instantiate(smoke, pos, new Quaternion(-90,0,0,90));
+            var newSmoke = (GameObject)Instantiate(smoke, pos, new Quaternion(-90, 0, 0, 90));
             //smoke.SetActive(false);
             newSmoke.SetActive(true);
 
@@ -146,6 +152,14 @@ namespace Assets.Scripts
             //buttons[0].GetComponent<Image>().color = !IsInAddEdgeMode ? Color.red : Color.white;
 
             IsInAddEdgeMode = true;
+        }
+
+        public void OnDeleteButtonclick()
+        {
+            //var buttons = FindObjectsOfType<Button>();
+            //buttons[0].GetComponent<Image>().color = !IsInAddEdgeMode ? Color.red : Color.white;
+
+            IsInDeleteMode = true;
         }
 
         public void OnExportButtonclick()
@@ -219,6 +233,21 @@ namespace Assets.Scripts
         {
             foreach (var o in FindObjectsOfType<GameObject>().Where(o => o.tag == "vertex" || o.tag == "edge" || o.tag == "smoke"))
                 Destroy(o);
+        }
+
+        private void Delete(Transform objectHit)
+        {
+            IsInDeleteMode = false;
+
+            var vertex = FindObjectsOfType<GameObject>().FirstOrDefault(o => o.transform == objectHit);
+            var edges = FindObjectsOfType<GameObject>().Where(o => vertex != null && (o.tag == "edge" && o.transform.position == vertex.transform.position));
+
+            var smoke = FindObjectsOfType<GameObject>().FirstOrDefault(o => vertex != null && (o.tag == "smoke" && o.transform.position == vertex.transform.position)); ;
+
+            Destroy(vertex);
+            Destroy(smoke);
+            foreach (var edge in edges)
+                Destroy(edge);
         }
     }
 }
