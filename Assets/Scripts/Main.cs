@@ -31,6 +31,7 @@ namespace Assets.Scripts
             JsonEdges = new List<JsonEdge>();
 
             //var smoke = GameObject.Find("WhiteSmoke");
+            //smoke.layer = 30;
             //smoke.SetActive(false);
         }
 
@@ -191,16 +192,23 @@ namespace Assets.Scripts
 
             if (path.Length != 0)
             {
-                DeleteAll();
+                //DeleteAll();
+                var delete =
+                    FindObjectsOfType<GameObject>().Where(o => o.tag == "vertex" || o.tag == "edge" || o.tag == "smoke");
+                var smoke = GameObject.Find("WhiteSmoke");
+
                 using (var file = new StreamReader(path))
                 {
                     var json = file.ReadToEnd();
                     var obj = JsonUtility.FromJson<JsonObject>(json);
+                    smoke.transform.position = new Vector3(obj.Vertexes[0].X, obj.Vertexes[0].Y, obj.Vertexes[0].Z);
                     foreach (var vertex in obj.Vertexes)
                         AddVertex(new Vector3(vertex.X, vertex.Y, vertex.Z), true);
                     foreach (var edge in obj.Edges)
                         AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2));
                 }
+                foreach (var o in delete)
+                    Destroy(o);
             }
 
             var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "applause");
