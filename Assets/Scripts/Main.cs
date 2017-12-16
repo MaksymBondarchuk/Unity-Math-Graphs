@@ -21,6 +21,8 @@ namespace Assets.Scripts
         private bool IsInAddVertexMode { get; set; }
         private bool IsInAddEdgeMode { get; set; }
         private bool IsInDeleteMode { get; set; }
+        private bool IsInOrientedMode { get; set; }
+
 
         private List<JsonVertex> JsonVertices { get; set; }
         private List<JsonEdge> JsonEdges { get; set; }
@@ -124,19 +126,23 @@ namespace Assets.Scripts
             cylinder.tag = "edge";
 
             #region Arrow
-            const float arrowLength = 1;
+            if (IsInOrientedMode)
+            {
+                const float arrowLength = 1;
 
-            var arrow1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            arrow1.transform.localScale = new Vector3(radius, arrowLength, radius);
-            arrow1.transform.position = node2;
-            arrow1.transform.up = node2 - node1 + Vector3.up;
-            arrow1.transform.Translate(Vector3.down);
+                var arrow1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                arrow1.transform.localScale = new Vector3(radius, arrowLength, radius);
+                arrow1.transform.position = node2;
+                arrow1.transform.up = node2 - node1 + Vector3.up;
+                arrow1.transform.Translate(Vector3.down);
 
-            var arrow2 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            arrow2.transform.localScale = new Vector3(radius, arrowLength, radius);
-            arrow2.transform.position = node2;
-            arrow2.transform.up = node2 - node1 - Vector3.up;
-            arrow2.transform.Translate(Vector3.down);
+                var arrow2 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                arrow2.transform.localScale = new Vector3(radius, arrowLength, radius);
+                arrow2.transform.position = node2;
+                arrow2.transform.up = node2 - node1 - Vector3.up;
+                arrow2.transform.Translate(Vector3.down);
+            }
+
             #endregion
 
             JsonEdges.Add(new JsonEdge
@@ -243,6 +249,11 @@ namespace Assets.Scripts
 
             var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "applause");
             sound.Play();
+        }
+
+        public void OnOrientedEdgeToggleChange()
+        {
+            IsInOrientedMode = !IsInOrientedMode;
         }
 
         private static void DeleteAll()
