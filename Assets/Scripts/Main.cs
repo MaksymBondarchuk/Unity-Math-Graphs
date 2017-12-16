@@ -123,6 +123,22 @@ namespace Assets.Scripts
             cylinder.transform.up = node2 - node1;
             cylinder.tag = "edge";
 
+            #region Arrow
+            const float arrowLength = 1;
+
+            var arrow1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            arrow1.transform.localScale = new Vector3(radius, arrowLength, radius);
+            arrow1.transform.position = node2;
+            arrow1.transform.up = node2 - node1 + Vector3.up;
+            arrow1.transform.Translate(Vector3.down);
+
+            var arrow2 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            arrow2.transform.localScale = new Vector3(radius, arrowLength, radius);
+            arrow2.transform.position = node2;
+            arrow2.transform.up = node2 - node1 - Vector3.up;
+            arrow2.transform.Translate(Vector3.down);
+            #endregion
+
             JsonEdges.Add(new JsonEdge
             {
                 X1 = node1.x,
@@ -240,9 +256,9 @@ namespace Assets.Scripts
             IsInDeleteMode = false;
 
             var vertex = FindObjectsOfType<GameObject>().FirstOrDefault(o => o.transform == objectHit);
-            var edges = FindObjectsOfType<GameObject>().Where(o => vertex != null && (o.tag == "edge" && o.transform.position == vertex.transform.position));
+            var edges = FindObjectsOfType<GameObject>().Where(o => vertex != null && o.tag == "edge" && o.transform.position == vertex.transform.position);
 
-            var smoke = FindObjectsOfType<GameObject>().FirstOrDefault(o => vertex != null && (o.tag == "smoke" && o.transform.position == vertex.transform.position)); ;
+            var smoke = FindObjectsOfType<GameObject>().FirstOrDefault(o => vertex != null && o.tag == "smoke" && o.transform.position == vertex.transform.position);
 
             Destroy(vertex);
             Destroy(smoke);
