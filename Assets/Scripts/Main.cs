@@ -22,6 +22,9 @@ namespace Assets.Scripts
         private bool IsInAddEdgeMode { get; set; }
         private bool IsInDeleteMode { get; set; }
         private bool IsInOrientedMode { get; set; }
+        private int Weight { get; set; }
+
+
 
 
         private List<JsonVertex> JsonVertices { get; set; }
@@ -93,7 +96,6 @@ namespace Assets.Scripts
                 pos = objPosition;
             }
 
-            //sphere.GetComponent<Renderer>().material.color = Color.red;
             sphere.tag = "vertex";
 
             JsonVertices.Add(new JsonVertex
@@ -104,9 +106,7 @@ namespace Assets.Scripts
             });
 
             var smoke = GameObject.Find("WhiteSmoke");
-            //smoke.SetActive(true);
             var newSmoke = (GameObject)Instantiate(smoke, pos, new Quaternion(-90, 0, 0, 90));
-            //smoke.SetActive(false);
             newSmoke.SetActive(true);
 
             var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "vertex sound");
@@ -124,6 +124,18 @@ namespace Assets.Scripts
             cylinder.transform.position = node1 + (node2 - node1) / 2;
             cylinder.transform.up = node2 - node1;
             cylinder.tag = "edge";
+
+            #region Label
+            if (Weight != 0)
+            {
+                var text = GameObject.Find("Test text");
+                var newText = (GameObject)Instantiate(text, node1 + (node2 - node1) / 2, Quaternion.identity);
+                //newText.transform.up += Vector3.up;
+                TextMesh txtMesh = newText.GetComponent<TextMesh>();
+                txtMesh.text = Weight.ToString();
+            }
+
+            #endregion
 
             #region Arrow
             if (IsInOrientedMode)
@@ -275,6 +287,12 @@ namespace Assets.Scripts
             Destroy(smoke);
             foreach (var edge in edges)
                 Destroy(edge);
+        }
+
+        public void OnWeightTextInput(string value)
+        {
+            int val;
+            Weight = int.TryParse(value, out val) ? val : 0;
         }
     }
 }
