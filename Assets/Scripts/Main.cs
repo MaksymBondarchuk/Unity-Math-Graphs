@@ -27,14 +27,16 @@ namespace Assets.Scripts
         private List<JsonVertex> JsonVertices { get; set; }
         private List<JsonEdge> JsonEdges { get; set; }
 
-        private List<GameObject> Edges { get; set; }
+        private List<Transform> Edges { get; set; }
+        private List<List<Transform>> Arrows { get; set; }
 
         private void Start()
         {
             HitObject = new List<Transform>();
             JsonVertices = new List<JsonVertex>();
             JsonEdges = new List<JsonEdge>();
-            Edges = new List<GameObject>();
+            Edges = new List<Transform>();
+            Arrows = new List<List<Transform>>();
         }
 
         private void Update()
@@ -54,6 +56,13 @@ namespace Assets.Scripts
             if (Physics.Raycast(ray, out hit))
             {
                 objectHit = hit.transform;
+                var idx = Edges.IndexOf(objectHit);
+                if (idx != -1)
+                    foreach (var arrow in Arrows[idx])
+                    {
+                        arrow.GetComponent<Renderer>().material.color = Color.yellow;
+                        HitObject.Add(arrow);
+                    }
                 objectHit.GetComponent<Renderer>().material.color = Color.yellow;
                 //objectHit.GetComponent<Renderer>().material.color = new Vector4(0, 209, 174, 45);
                 //objectHit.GetComponent<Renderer>().material.color = new Vector4(0, 255, 0, 0);
@@ -120,6 +129,7 @@ namespace Assets.Scripts
             cylinder.transform.position = node1 + (node2 - node1) / 2;
             cylinder.transform.up = node2 - node1;
             cylinder.tag = "edge";
+            Edges.Add(cylinder.transform);
 
             #region Label
             if (Weight != 0 || weight != 0)
@@ -148,7 +158,16 @@ namespace Assets.Scripts
                 arrow2.transform.position = node2;
                 arrow2.transform.up = node2 - node1 - Vector3.up;
                 arrow2.transform.Translate(Vector3.down);
+
+                Arrows.Add(new List<Transform> { arrow1.transform, arrow2.transform });
+
+                Edges.Add(arrow1.transform);
+                Arrows.Add(new List<Transform> { cylinder.transform, arrow2.transform });
+
+                Edges.Add(arrow2.transform);
+                Arrows.Add(new List<Transform> { arrow1.transform, cylinder.transform });
             }
+            else Arrows.Add(new List<Transform>());
             #endregion
 
             JsonEdges.Add(new JsonEdge
