@@ -7,14 +7,8 @@ namespace Assets.Scripts
     [Serializable]
     public class JsonObject
     {
-        public List<JsonVertex> Vertexes;
+        public List<JsonVertex> Vertices;
         public List<JsonEdge> Edges;
-
-
-        //public List<Vector3> Vertexes;
-        //public Vector3[] Vertexes;
-        ////public List<Vector3> Edges;
-        //public Vector3[] Edges;
     }
 
     [Serializable]
@@ -23,7 +17,6 @@ namespace Assets.Scripts
         public float X;
         public float Y;
         public float Z;
-        //public Vector3 Vertex;
     }
 
     [Serializable]
@@ -36,7 +29,9 @@ namespace Assets.Scripts
         public float X2;
         public float Y2;
         public float Z2;
-        //public float x;
-        //public Vector3 Edge;
+
+
+        public bool IsOriented;
+        public int Weight;
     }
 }

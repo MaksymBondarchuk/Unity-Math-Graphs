@@ -24,21 +24,17 @@ namespace Assets.Scripts
         private bool IsInOrientedMode { get; set; }
         private int Weight { get; set; }
 
-
-
-
         private List<JsonVertex> JsonVertices { get; set; }
         private List<JsonEdge> JsonEdges { get; set; }
+
+        private List<GameObject> Edges { get; set; }
 
         private void Start()
         {
             HitObject = new List<Transform>();
             JsonVertices = new List<JsonVertex>();
             JsonEdges = new List<JsonEdge>();
-
-            //var smoke = GameObject.Find("WhiteSmoke");
-            //smoke.layer = 30;
-            //smoke.SetActive(false);
+            Edges = new List<GameObject>();
         }
 
         private void Update()
@@ -113,7 +109,7 @@ namespace Assets.Scripts
             sound.Play();
         }
 
-        private void AddEdge(Vector3 node1, Vector3 node2)
+        private void AddEdge(Vector3 node1, Vector3 node2, bool isOriented = false, int weight = 0)
         {
             var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 
@@ -126,19 +122,18 @@ namespace Assets.Scripts
             cylinder.tag = "edge";
 
             #region Label
-            if (Weight != 0)
+            if (Weight != 0 || weight != 0)
             {
                 var text = GameObject.Find("Test text");
                 var newText = (GameObject)Instantiate(text, node1 + (node2 - node1) / 2, Quaternion.identity);
                 //newText.transform.up += Vector3.up;
                 TextMesh txtMesh = newText.GetComponent<TextMesh>();
-                txtMesh.text = Weight.ToString();
+                txtMesh.text = (Weight == 0 ? weight : Weight).ToString();
             }
-
             #endregion
 
             #region Arrow
-            if (IsInOrientedMode)
+            if (IsInOrientedMode || isOriented)
             {
                 const float arrowLength = 1;
 
@@ -154,7 +149,6 @@ namespace Assets.Scripts
                 arrow2.transform.up = node2 - node1 - Vector3.up;
                 arrow2.transform.Translate(Vector3.down);
             }
-
             #endregion
 
             JsonEdges.Add(new JsonEdge
@@ -164,7 +158,9 @@ namespace Assets.Scripts
                 Z1 = node1.z,
                 X2 = node2.x,
                 Y2 = node2.y,
-                Z2 = node2.z
+                Z2 = node2.z,
+                IsOriented = IsInOrientedMode,
+                Weight = Weight
             });
 
             var sound = FindObjectsOfType<AudioSource>().First(s => s.tag == "edge sound");
@@ -214,7 +210,7 @@ namespace Assets.Scripts
             {
                 var jsonObject = new JsonObject
                 {
-                    Vertexes = JsonVertices,
+                    Vertices = JsonVertices,
                     Edges = JsonEdges,
                 };
 
@@ -249,11 +245,12 @@ namespace Assets.Scripts
                 {
                     var json = file.ReadToEnd();
                     var obj = JsonUtility.FromJson<JsonObject>(json);
-                    smoke.transform.position = new Vector3(obj.Vertexes[0].X, obj.Vertexes[0].Y, obj.Vertexes[0].Z);
-                    foreach (var vertex in obj.Vertexes)
+                    smoke.transform.position = new Vector3(obj.Vertices[0].X, obj.Vertices[0].Y, obj.Vertices[0].Z);
+                    foreach (var vertex in obj.Vertices)
                         AddVertex(new Vector3(vertex.X, vertex.Y, vertex.Z), true);
                     foreach (var edge in obj.Edges)
-                        AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2));
+                        AddEdge(new Vector3(edge.X1, edge.Y1, edge.Z1), new Vector3(edge.X2, edge.Y2, edge.Z2),
+                            edge.IsOriented, edge.Weight);
                 }
                 foreach (var o in delete)
                     Destroy(o);
